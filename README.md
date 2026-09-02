@@ -18,6 +18,3 @@ GIPHY_API_KEY=...
 ## Commands
 - `/ping` — health check
 - `/language` — set grammar dialect (American/British) for the server
-
-## Demo
-<img width="1002" height="498" alt="image" src="https://github.com/user-attachments/assets/4d102ac6-e4f8-4a8c-84bc-773fa02955d4" />
