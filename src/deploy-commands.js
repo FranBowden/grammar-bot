@@ -8,7 +8,7 @@ const commands = [
   },
   {
     name: 'language',
-    description: 'Set the language for grammar checking (e.g., American, British)',
+    description: 'Set the language for grammar checking (e.g., American English, British English)',
     options: [
       {
         name: 'dialect',
@@ -16,8 +16,8 @@ const commands = [
         description: 'Choose a dialect',
         required: true,
         choices: [
-          { name: 'American', value: 'american' },
-          { name: 'British', value: 'british' },
+          { name: 'American English', value: 'american' },
+          { name: 'British English', value: 'british' },
         ],
       },
     ],
