@@ -65,7 +65,10 @@ client.on(Events.MessageCreate, async (message) => {
 
     await message.reply({ embeds: [embed] });
   } catch (error) {
-    console.error("Error checking grammar:", error);
+    console.error(
+      `Error checking grammar (guild=${message.guild.id}, channel=${message.channel.id}, user=${message.author.id}):`,
+      error,
+    );
   }
 });
 
