@@ -1,12 +1,20 @@
 require("dotenv").config();
 const { checkGrammar } = require("./grammar.js");
 const { getAngryGif } = require("./gif.js");
+const { execSync } = require("child_process");
 const {
   setGifFeatureEnabled,
   setGrammarCheckEnabled,
   isGrammarCheckEnabled,
   isGifFeatureEnabled,
 } = require("./utils.js");
+
+try {
+  execSync("node src/deploy-commands.js", { stdio: "inherit" });
+  console.log("Commands deployed");
+} catch (err) {
+  console.error("Command deploy failed:", err);
+}
 
 const {
   Client,
