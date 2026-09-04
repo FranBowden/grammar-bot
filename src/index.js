@@ -1,14 +1,23 @@
 require("dotenv").config();
-const { checkGrammar } = require("./grammar.js");
-const { getAngryGif } = require("./gif.js");
 const { execSync } = require("child_process");
 const {
-  setGifFeatureEnabled,
-  setGrammarCheckEnabled,
+  Client,
+  GatewayIntentBits,
+  Events,
+  EmbedBuilder,
+} = require("discord.js");
+
+const { checkGrammar } = require("./grammar.js");
+const { buildFeedback } = require("./feedback.js");
+const { getAngryGif } = require("./gif.js");
+const { commands } = require("./commands");
+const {
   isGrammarCheckEnabled,
   isGifFeatureEnabled,
-} = require("./utils.js");
+  getDialect,
+} = require("./serverSettings.js");
 
+// execute the deploy-commands.js script to register slash commands with Discord
 try {
   execSync("node src/deploy-commands.js", { stdio: "inherit" });
   console.log("Commands deployed");
@@ -16,12 +25,8 @@ try {
   console.error("Command deploy failed:", err);
 }
 
-const {
-  Client,
-  GatewayIntentBits,
-  Events,
-  EmbedBuilder,
-} = require("discord.js");
+const BOT_TOKEN = process.env.BOT_TOKEN;
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -29,34 +34,34 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-const serverDialects = new Map();
-
-const BOT_TOKEN = process.env.BOT_TOKEN;
 
 client.on(Events.ClientReady, (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}!`);
 });
 
+/**
+ * The event listener for new messages
+ */
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
   if (!isGrammarCheckEnabled(message.guild.id)) return;
 
   try {
-    const dialect = serverDialects.get(message.guild.id) || "american";
+    const dialect = getDialect(message.guild.id);
     const lints = await checkGrammar(message.content, dialect);
-    if (lints.length > 0) {
-      const feedback = lints.map((lint) => lint.message).join(" ");
-      if (!isGifFeatureEnabled(message.guild.id)) {
-        await message.reply(feedback);
-        return;
-      }
-      const gifUrl = await getAngryGif();
-      const embed = new EmbedBuilder()
-        .setDescription(feedback)
-        .setImage(gifUrl);
+    if (lints.length === 0) return;
 
-      await message.reply({ embeds: [embed] });
+    if (!isGifFeatureEnabled(message.guild.id)) {
+      await message.reply(buildFeedback(lints, 2000));
+      return;
     }
+
+    const gifUrl = await getAngryGif();
+    const embed = new EmbedBuilder()
+      .setDescription(buildFeedback(lints, 4096))
+      .setImage(gifUrl);
+
+    await message.reply({ embeds: [embed] });
   } catch (error) {
     console.error("Error checking grammar:", error);
   }
@@ -65,38 +70,17 @@ client.on(Events.MessageCreate, async (message) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === "ping") {
-    await interaction.reply("Pong!");
-  }
+  const command = commands.get(interaction.commandName);
+  if (!command) return;
 
-  if (interaction.commandName === "language") {
-    const dialect = interaction.options.getString("dialect");
-    const dialectLabels = {
-      american: "American English",
-      british: "British English",
-    };
-    serverDialects.set(interaction.guild.id, dialect);
-    await interaction.reply(
-      `Language set to: ${dialectLabels[dialect] || dialect}`,
-    );
-  }
-
-  if (interaction.commandName === "gif-feature-toggle") {
-    const toggle = interaction.options.getString("toggle");
-    const isEnabled = toggle === "enable";
-    setGifFeatureEnabled(interaction.guild.id, isEnabled);
-    await interaction.reply(
-      `GIF feature has been ${isEnabled ? "enabled" : "disabled"}.`,
-    );
-  }
-
-  if (interaction.commandName === "grammar-check-toggle") {
-    const toggle = interaction.options.getString("toggle");
-    const isEnabled = toggle === "enable";
-    setGrammarCheckEnabled(interaction.guild.id, isEnabled);
-    await interaction.reply(
-      `Grammar checking has been ${isEnabled ? "enabled" : "disabled"}.`,
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(
+      `Error executing command "${interaction.commandName}":`,
+      error,
     );
   }
 });
+
 client.login(BOT_TOKEN);

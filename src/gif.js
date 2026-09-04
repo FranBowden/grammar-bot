@@ -10,6 +10,7 @@ let lastFetch = 0;
 
 /**
  * Make api requests to Giphy for gifs matching the search terms and return an array of gif urls
+ * 
  * @returns
  */
 async function fetchGifBatch() {
