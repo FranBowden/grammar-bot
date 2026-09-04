@@ -37,7 +37,7 @@ Removing the Bot from your server stops all message processing for that server, 
 
 ## Contact
 
-Questions about this policy can be sent via [GitHub Issues](https://github.com/FranBowden/grammar-bot/issues) or to francescalbowden@gmail.com.
+Questions about this policy can be sent via [GitHub Issues](https://github.com/FranBowden/grammar-bot/issues)
 
 ## Changes to This Policy
 
