@@ -39,14 +39,14 @@ client.on(Events.ClientReady, (readyClient) => {
 
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
-  if (!isGrammarCheckEnabled()) return;
+  if (!isGrammarCheckEnabled(message.guild.id)) return;
 
   try {
     const dialect = serverDialects.get(message.guild.id) || "american";
     const lints = await checkGrammar(message.content, dialect);
     if (lints.length > 0) {
       const feedback = lints.map((lint) => lint.message).join(" ");
-      if (!isGifFeatureEnabled()) {
+      if (!isGifFeatureEnabled(message.guild.id)) {
         await message.reply(feedback);
         return;
       }
@@ -84,7 +84,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.commandName === "gif-feature-toggle") {
     const toggle = interaction.options.getString("toggle");
     const isEnabled = toggle === "enable";
-    setGifFeatureEnabled(isEnabled);
+    setGifFeatureEnabled(interaction.guild.id, isEnabled);
     await interaction.reply(
       `GIF feature has been ${isEnabled ? "enabled" : "disabled"}.`,
     );
@@ -93,7 +93,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.commandName === "grammar-check-toggle") {
     const toggle = interaction.options.getString("toggle");
     const isEnabled = toggle === "enable";
-    setGrammarCheckEnabled(isEnabled);
+    setGrammarCheckEnabled(interaction.guild.id, isEnabled);
     await interaction.reply(
       `Grammar checking has been ${isEnabled ? "enabled" : "disabled"}.`,
     );

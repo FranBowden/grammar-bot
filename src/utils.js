@@ -1,21 +1,21 @@
-let gifFeatureEnabled = true;
+const gifFeatureByServer = new Map();
 
-function isGifFeatureEnabled() {
-  return gifFeatureEnabled;
+function isGifFeatureEnabled(serverId) {
+  return gifFeatureByServer.get(serverId) ?? true;
 }
 
-function setGifFeatureEnabled(enabled) {
-  gifFeatureEnabled = enabled;
+function setGifFeatureEnabled(serverId, enabled) {
+  gifFeatureByServer.set(serverId, enabled);
 }
 
-let grammarCheckEnabled = true;
+const grammarCheckByServer = new Map();
 
-function isGrammarCheckEnabled() {
-  return grammarCheckEnabled;
+function isGrammarCheckEnabled(serverId) {
+  return grammarCheckByServer.get(serverId) ?? true;
 }
 
-function setGrammarCheckEnabled(enabled) {
-  grammarCheckEnabled = enabled;
+function setGrammarCheckEnabled(serverId, enabled) {
+  grammarCheckByServer.set(serverId, enabled);
 }
 
 module.exports = {
