@@ -20,3 +20,6 @@ Thumbs.db
 
 dist/
 build/
+
+# Persisted server settings
+data/

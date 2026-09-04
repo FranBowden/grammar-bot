@@ -1,4 +1,3 @@
-# flyctl launch added from .gitignore
 **/.env
 **/.env.local
 **/.env.*.local
@@ -22,8 +21,7 @@
 **/dist
 **/build
 
-# flyctl launch added from node_modules/.gitignore
-# Environment variables (NEVER commit tokens/secrets)
+# Environment variables 
 node_modules/**/.env
 node_modules/**/.env.local
 node_modules/**/.env.*.local
@@ -44,7 +42,6 @@ node_modules/**/Thumbs.db
 node_modules/**/.vscode
 node_modules/**/.idea
 
-# Build output (if you ever add one)
+# Build output
 node_modules/**/dist
 node_modules/**/build
-fly.toml

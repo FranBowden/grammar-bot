@@ -16,6 +16,7 @@ const {
   isGifFeatureEnabled,
   getDialect,
   getStrictness,
+  deleteServerSettings,
 } = require("./server-settings.js");
 
 // execute the deploy-commands.js script to register slash commands with Discord
@@ -38,6 +39,10 @@ const client = new Client({
 
 client.on(Events.ClientReady, (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}!`);
+});
+
+client.on(Events.GuildDelete, (guild) => {
+  deleteServerSettings(guild.id);
 });
 
 /**

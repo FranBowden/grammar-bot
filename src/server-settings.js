@@ -1,10 +1,51 @@
+const fs = require("fs");
+const path = require("path");
+
 const DEFAULT_DIALECT = "american";
 const DEFAULT_STRICTNESS = "standard";
 
-const gifFeatureByServer = new Map();
-const grammarCheckByServer = new Map();
-const dialectByServer = new Map();
-const strictnessByServer = new Map();
+const DATA_DIR = path.join(__dirname, "..", "data");
+const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
+
+let settingsByServer = loadSettings();
+
+/**
+ * Loads persisted server settings from disk, if present.
+ * @returns {object} settings keyed by server ID
+ */
+function loadSettings() {
+  try {
+    return JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf8"));
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      console.error("Failed to load server settings, starting fresh:", error);
+    }
+    return {};
+  }
+}
+
+/**
+ * Writes the current settings to disk (atomically, via a temp file + rename).
+ */
+function saveSettings() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  const tempFile = `${SETTINGS_FILE}.tmp`;
+  fs.writeFileSync(tempFile, JSON.stringify(settingsByServer, null, 2));
+  fs.renameSync(tempFile, SETTINGS_FILE);
+}
+
+/**
+ * Updates a single setting for a server and persists the change.
+ * @param {*} serverId
+ * @param {string} key
+ * @param {*} value
+ */
+function setSetting(serverId, key, value) {
+  const server = settingsByServer[serverId] ?? {};
+  server[key] = value;
+  settingsByServer[serverId] = server;
+  saveSettings();
+}
 
 /**
  * Checks if the GIF feature is enabled for a given server
@@ -13,7 +54,7 @@ const strictnessByServer = new Map();
  * @returns
  */
 function isGifFeatureEnabled(serverId) {
-  return gifFeatureByServer.get(serverId) ?? true;
+  return settingsByServer[serverId]?.gifFeatureEnabled ?? true;
 }
 
 /**
@@ -23,7 +64,7 @@ function isGifFeatureEnabled(serverId) {
  * @param {boolean} enabled
  */
 function setGifFeatureEnabled(serverId, enabled) {
-  gifFeatureByServer.set(serverId, enabled);
+  setSetting(serverId, "gifFeatureEnabled", enabled);
 }
 
 /**
@@ -33,7 +74,7 @@ function setGifFeatureEnabled(serverId, enabled) {
  * @returns
  */
 function isGrammarCheckEnabled(serverId) {
-  return grammarCheckByServer.get(serverId) ?? true;
+  return settingsByServer[serverId]?.grammarCheckEnabled ?? true;
 }
 
 /**
@@ -43,7 +84,7 @@ function isGrammarCheckEnabled(serverId) {
  * @param {boolean} enabled
  */
 function setGrammarCheckEnabled(serverId, enabled) {
-  grammarCheckByServer.set(serverId, enabled);
+  setSetting(serverId, "grammarCheckEnabled", enabled);
 }
 
 /**
@@ -53,7 +94,7 @@ function setGrammarCheckEnabled(serverId, enabled) {
  * @returns
  */
 function getDialect(serverId) {
-  return dialectByServer.get(serverId) ?? DEFAULT_DIALECT;
+  return settingsByServer[serverId]?.dialect ?? DEFAULT_DIALECT;
 }
 
 /**
@@ -63,7 +104,7 @@ function getDialect(serverId) {
  * @param {string} dialect
  */
 function setDialect(serverId, dialect) {
-  dialectByServer.set(serverId, dialect);
+  setSetting(serverId, "dialect", dialect);
 }
 
 /**
@@ -73,7 +114,7 @@ function setDialect(serverId, dialect) {
  * @returns
  */
 function getStrictness(serverId) {
-  return strictnessByServer.get(serverId) ?? DEFAULT_STRICTNESS;
+  return settingsByServer[serverId]?.strictness ?? DEFAULT_STRICTNESS;
 }
 
 /**
@@ -83,7 +124,18 @@ function getStrictness(serverId) {
  * @param {string} strictness
  */
 function setStrictness(serverId, strictness) {
-  strictnessByServer.set(serverId, strictness);
+  setSetting(serverId, "strictness", strictness);
+}
+
+/**
+ * Deletes all stored settings for a server (e.g. when the Bot is removed from it)
+ *
+ * @param {*} serverId
+ */
+function deleteServerSettings(serverId) {
+  if (!(serverId in settingsByServer)) return;
+  delete settingsByServer[serverId];
+  saveSettings();
 }
 
 module.exports = {
@@ -95,4 +147,5 @@ module.exports = {
   setDialect,
   getStrictness,
   setStrictness,
+  deleteServerSettings,
 };
