@@ -15,7 +15,8 @@ const {
   isGrammarCheckEnabled,
   isGifFeatureEnabled,
   getDialect,
-} = require("./serverSettings.js");
+  getStrictness,
+} = require("./server-settings.js");
 
 // execute the deploy-commands.js script to register slash commands with Discord
 try {
@@ -48,7 +49,8 @@ client.on(Events.MessageCreate, async (message) => {
 
   try {
     const dialect = getDialect(message.guild.id);
-    const lints = await checkGrammar(message.content, dialect);
+    const strictness = getStrictness(message.guild.id);
+    const lints = await checkGrammar(message.content, dialect, strictness);
     if (lints.length === 0) return;
 
     if (!isGifFeatureEnabled(message.guild.id)) {

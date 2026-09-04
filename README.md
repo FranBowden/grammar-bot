@@ -24,5 +24,9 @@ Built with Node.js, discord.js, and Harper. This bot is designed to run in Disco
 - `/language` — set grammar dialect (American/British English) for the server
 - `/gif-feature-toggle` — enable or disable the angry GIF reply for the server
 - `/grammar-check-toggle` — enable or disable grammar checking entirely for the server
+- `/strictness` — set how strict grammar checking is for the server:
+  - `relaxed`
+  - `standard` (default)
+  - `strict`
 
-Each command lives in its own file under [src/commands/](src/commands/) — to add a new one, drop a new file in that folder exporting `{ data, execute }`.
+Each command lives in its own file under [src/commands/](src/commands/)

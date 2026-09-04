@@ -1,4 +1,4 @@
-const { setGrammarCheckEnabled } = require("../serverSettings.js");
+const { setGrammarCheckEnabled } = require("../server-settings.js");
 
 module.exports = {
   data: {

@@ -1,4 +1,4 @@
-const { setDialect } = require("../serverSettings.js");
+const { setDialect } = require("../server-settings.js");
 
 const DIALECT_LABELS = {
   american: "American English",

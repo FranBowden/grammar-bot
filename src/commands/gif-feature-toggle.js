@@ -1,4 +1,4 @@
-const { setGifFeatureEnabled } = require("../serverSettings.js");
+const { setGifFeatureEnabled } = require("../server-settings.js");
 
 module.exports = {
   data: {

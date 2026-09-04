@@ -1,8 +1,10 @@
 const DEFAULT_DIALECT = "american";
+const DEFAULT_STRICTNESS = "standard";
 
 const gifFeatureByServer = new Map();
 const grammarCheckByServer = new Map();
 const dialectByServer = new Map();
+const strictnessByServer = new Map();
 
 /**
  * Checks if the GIF feature is enabled for a given server
@@ -64,6 +66,26 @@ function setDialect(serverId, dialect) {
   dialectByServer.set(serverId, dialect);
 }
 
+/**
+ * Gets the strictness level for a given server
+ *
+ * @param {*} serverId
+ * @returns
+ */
+function getStrictness(serverId) {
+  return strictnessByServer.get(serverId) ?? DEFAULT_STRICTNESS;
+}
+
+/**
+ * Sets the strictness level for a given server
+ *
+ * @param {*} serverId
+ * @param {string} strictness
+ */
+function setStrictness(serverId, strictness) {
+  strictnessByServer.set(serverId, strictness);
+}
+
 module.exports = {
   isGifFeatureEnabled,
   setGifFeatureEnabled,
@@ -71,4 +93,6 @@ module.exports = {
   setGrammarCheckEnabled,
   getDialect,
   setDialect,
+  getStrictness,
+  setStrictness,
 };
