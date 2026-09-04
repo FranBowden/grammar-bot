@@ -76,6 +76,8 @@ const RELAXED_ACCEPTED_WORDS = [
   "ptal",
   "iykyk",
   "icymi",
+  "xD",
+  "xDD",
 ];
 
 /**
